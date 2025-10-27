@@ -15,12 +15,17 @@ end
 end
 
 % Running Naive DFT For different values of n
-exec_t = zeros(10,1);
-samples = 1000;
-for n=0:10
-    exec_t(n+1) = timeit(@() NaiveDFT(samples)); % Measure execution time for Naive DFT
-    samples = samples+1000;
+exec_t = zeros(100,1);
+samples = linspace(1000,50000,100);
+for n=1:100
+    exec_t(n) = timeit(@() NaiveDFT(n)); % Measure execution time for Naive DFT
 end
 
 figure;
-subplot()
+hold on 
+plot(samples, exec_t); 
+extimecomp = 25e-14*samples.^2;
+plot(samples, extimecomp);
+hold off
+
+clc;
