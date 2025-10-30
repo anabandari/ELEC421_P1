@@ -2,21 +2,64 @@
 % Project 1 Main
 %%%%%%%%%%%%%%%%%%%%%
 
+% Prompt user for custom signal
+prompt = "Would you like to enter your own analog sinusoidal signal? Y/N [Y]: ";
+txt = input(prompt,"s");
+if isempty(txt); txt = 'Y'; end
+
+if upper(txt) == 'Y'
+    % User-defined sinusoidal parameters
+    A = input('Enter amplitude (e.g., 5): ');
+    if isempty(A); A = 5; end
+    
+    f = input('Enter frequency in Hz (e.g., 100): ');
+    if isempty(f); f = 100; end
+    
+    Fs = input('Enter sampling frequency in Hz (e.g., 1000): ');
+    if isempty(Fs); Fs = 1000; end
+    
+    T = input('Enter duration in seconds (e.g., 1): ');
+    if isempty(T); T = 1; end
+    
+    t = 0:1/Fs:T-1/Fs; % time vector
+    Signal = A * sin(2*pi*f*t);
+else
+    % Default signal
+    Fs = 1000; T = 1; t = 0:1/Fs:T-1/Fs;
+    Signal = 5 * sin(200*pi*t);
+end
+
 %%%%%%%%%%%%%%%%%%%%%
 % Part 1 - Section 2 Plots
 %%%%%%%%%%%%%%%%%%%%%
-%{ Running Naive DFT For different values of n
-% exec_t = zeros(100,1);
-% samples = linspace(1000,50000,100);
-% for n=1:100
-%   exec_t(n) = timeit(@() NaiveDFT(n)); % Measure execution time for Naive DFT
-% end
-% 
-% figure;
-% hold on 
-% plot(samples, exec_t); 
-% extimecomp = 25e-14*samples.^2;
-% plot(samples, extimecomp);
-% hold off
-%}
+% Running Naive DFT for different values of N
+
+N_values = linspace(1000,5000,10); % example sample sizes
+exec_t = zeros(length(N_values),1);
+
+for idx = 1:length(N_values)
+    N = round(N_values(idx));
+    
+    % Ensure Signal length matches N (truncate or pad)
+    if length(Signal) < N
+        x = [Signal zeros(1, N - length(Signal))];
+    else
+        x = Signal(1:N);
+    end
+    
+    exec_t(idx) = timeit(@() naive_dft(x, N)); % Measure execution time
+end
+
+figure;
+hold on
+plot(N_values, exec_t, 'LineWidth', 1.5);
+extimecomp = 1e-7*N_values.^2;
+plot(N_values, extimecomp, '--', 'LineWidth', 1.5);
+xlabel('Number of samples N');
+ylabel('Execution Time (s)');
+legend('Naive DFT', 'Theoretical O(N^2)');
+title('Execution Time of Naive DFT vs Sample Size');
+grid on
+hold off
+
 clc;

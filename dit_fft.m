@@ -2,7 +2,6 @@
 % Part 2 - Decimation-in-Time (DIT) FFT Implementation
 %%%%%%%%%%%%%%%%%%%%%
 
-
 function X = dit_fft(x)
     x = x(:);  % ensure column vector
     N = length(x);
