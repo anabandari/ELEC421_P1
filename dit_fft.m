@@ -1,23 +1,44 @@
 %%%%%%%%%%%%%%%%%%%%%
 % Part 2 - Decimation-in-Time (DIT) FFT Implementation
 %%%%%%%%%%%%%%%%%%%%%
-function decintime = dit_fft(Signal, Samples)
-    decintime = zeros(1, Samples);
-    ditodd = Signal(2:2:Samples);
-    diteven = Signal(1:2:Samples);
-    twiddlehalf = Twiddle(Samples/2);
-    twiddlefull = Twiddle(Samples);
-    
-    for k=1:Samples
-        for r=1:(Samples/2)
-            decintime(k) = decintime(k) + diteven(r)*twiddlehalf^(r*k) + twiddlefull^(k)*ditodd(r)*twiddlehalf^(r*k);
-        end 
-    end
-end 
 
-function twid = Twiddle(N)
-    twid = zeros(1,N);
-    for k = 0:N-1
-        twid(k+1) = exp(-2*pi*1i*k/N); % Compute the twiddle factors
+
+function X = dit_fft(x)
+    x = x(:);  % ensure column vector
+    N = length(x);
+
+    % If N is not a power of 2, pad with zeros
+    if mod(log2(N),1) ~= 0
+        N_next = 2^nextpow2(N);
+        x = [x; zeros(N_next - N, 1)];
+        N = N_next;
     end
-end 
+
+    % Base case
+    if N == 1
+        X = x;
+        return;
+    end
+
+    % Split into even and odd indices
+    x_even = x(1:2:end);
+    x_odd  = x(2:2:end);
+
+    % Recursive calls
+    X_even = ditfft_butterfly_pad_twiddle(x_even);
+    X_odd  = ditfft_butterfly_pad_twiddle(x_odd);
+
+    % Compute twiddle factors using separate function
+    W = twiddle(N);
+
+    % Butterfly combination
+    X = zeros(N,1);
+    X(1:N/2)     = X_even + W .* X_odd;
+    X(N/2+1:N)   = X_even - W .* X_odd;
+end
+
+function W = twiddle(N)
+    % Compute the DIT FFT twiddle factors for N-point FFT
+    k = (0:N/2-1).';
+    W = exp(-1j*2*pi*k/N);
+end
