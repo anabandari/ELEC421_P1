@@ -2,22 +2,27 @@
 % Part 3 - Decimation-in-Frequency (DIF) FFT Implementation
 %%%%%%%%%%%%%%%%%%%%%
 
-x_sample = [ones(5,  1)]; % sample signal for now
+% x_sample = [ones(5,  1)]; % sample signal for now
+x_sample = [5,3,2,1,0,0].';
 
 % declare global counter value to use in function
 global counter;
 counter = 0;
 
 % call function
-[X_k, X_k_bit_reversed, X_k_FFT, DIF_error] = dif_fft_func(x_sample);
-% outBitReversed = bitrevorder(out);
-% scaledFFTInput = [ones(5, 1); zeros(3, 1)];
-% outFFT = fft(scaledFFTInput);
+[X_k, X_k_bit_reversed, X_k_FFT, DIF_diff, t] = dif_fft_func(x_sample);
+
 
 % FUNCTION: Takes DIT FFT of discrete input signal
 % param: x_n, discrete input signal
-% return: X_k, discrete output signal
-function [X_k, X_k_bit_reversed, X_k_FFT, DIF_error] = dif_fft_func(x_n)
+% return: 
+%   X_k, DIF FFT discrete output signal
+%   X_k_bit_reversed, bit reversed DIF FFT discrete output signal
+%   X_k_fft, MATLAB FFT discrete output signal
+%   DIF_diff, difference between DIF FFT and MATLAB FFT outputs
+function [X_k, X_k_bit_reversed, X_k_FFT, DIF_diff, t] = dif_fft_func(x_n)
+tic;
+
 global counter;
 if (counter == 0) % only check on first recursive loop
     x_n_len = length(x_n);
@@ -69,9 +74,12 @@ X_odd = dif_fft_func(X_odd);
 
 % Compile results
 X_k = [X_even; X_odd];
+
+t = toc;
+
 X_k_bit_reversed = bitrevorder(X_k);
 X_k_FFT = fft(x_n);
-DIF_error = abs(X_k_bit_reversed) - abs(X_k_FFT);
+DIF_diff = abs(X_k_bit_reversed) - abs(X_k_FFT);
 
 end
 
