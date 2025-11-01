@@ -34,7 +34,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%
 % Running Naive DFT for different values of N
 
-N_values = linspace(1000,5000,10); % example sample sizes
+N_low = 1;
+N_high = 100;
+N_samples = 10;
+
+N_values = linspace(N_low, N_high, N_samples); % example sample sizes
 exec_t = zeros(length(N_values),1);
 
 for idx = 1:length(N_values)
@@ -53,11 +57,8 @@ end
 figure;
 hold on
 plot(N_values, exec_t, 'LineWidth', 1.5);
-extimecomp = 1e-7*N_values.^2;
-plot(N_values, extimecomp, '--', 'LineWidth', 1.5);
 xlabel('Number of samples N');
 ylabel('Execution Time (s)');
-legend('Naive DFT', 'Theoretical O(N^2)');
 title('Execution Time of Naive DFT vs Sample Size');
 grid on
 hold off
