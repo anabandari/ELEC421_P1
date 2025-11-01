@@ -1,13 +1,15 @@
 %%%%%%%%%%%%%%%%%%%%%
 % Part 2 - Decimation-in-Time (DIT) FFT Implementation
+% 
+% With reference from https://youtu.be/Ty0JcR6Dvis?si=RcP4nY_l-D2J5zA-
 %%%%%%%%%%%%%%%%%%%%%
 
-function X = dit_fft(x)
+function X = dit_fft_test(x)
     x = x(:);  % ensure column vector
     N = length(x);
 
     % If N is not a power of 2, pad with zeros
-    if mod(log2(N),1) ~= 0
+    if mod(log2(N), 1) ~= 0
         N_next = 2^nextpow2(N);
         x = [x; zeros(N_next - N, 1)];
         N = N_next;
@@ -24,11 +26,11 @@ function X = dit_fft(x)
     x_odd  = x(2:2:end);
 
     % Recursive calls
-    X_even = ditfft_butterfly_pad_twiddle(x_even);
-    X_odd  = ditfft_butterfly_pad_twiddle(x_odd);
+    X_even = dit_fft_test(x_even);
+    X_odd  = dit_fft_test(x_odd);
 
-    % Compute twiddle factors using separate function
-    W = twiddle(N);
+    % Compute N/2 twiddle factors
+    W = exp(-1i * 2 * pi * (0:(N/2 - 1))' / N);
 
     % Butterfly combination
     X = zeros(N,1);
@@ -36,8 +38,6 @@ function X = dit_fft(x)
     X(N/2+1:N)   = X_even - W .* X_odd;
 end
 
-function W = twiddle(N)
-    % Compute the DIT FFT twiddle factors for N-point FFT
-    k = (0:N/2-1).';
-    W = exp(-1j*2*pi*k/N);
-end
+test1 = fft([5,3,2,1,0,0])
+
+test2 = dit_fft_test([5,3,2,1,0,0])
