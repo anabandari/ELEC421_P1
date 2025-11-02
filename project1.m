@@ -127,7 +127,6 @@ hold off;
 % Part 4 - Frequency Analysis of Audio Signal
 %%%%%%%%%%%%%%%%%%%%%
 
-
 % 4.1: Load audio signals
 
 clean_signal_filename = "clean_signal.wav";
@@ -138,23 +137,33 @@ noisy_signal_filename = "noisy_signal.wav";
 [cs_data, cs_sample_rate] = audioread(clean_signal_filename);
 [ns_data, ns_sample_rate] = audioread(noisy_signal_filename);
 
+% extra feature: apply bandpass, Butterworth filter to noisy audio file
+% used filterDesigner tool from L15 to create filter with:
+ns_filtered_data = filter(Hd2, ns_data);
+audiowrite('noisy_signal_filtered.wav', ns_filtered_data, ns_sample_rate);
+% sound(ns_filtered_data, ns_sample_rate); % to test sound in MATLAB
+
 % 4.2: Apply FFT and Plot Spectrum
 
 % take DIF FFT of clean signal and noisy signal
 cs_X = bitrevorder(dif_fft(cs_data));
 ns_X = bitrevorder(dif_fft(ns_data));
+nsf_X = bitrevorder(dif_fft(ns_filtered_data));
 
 % find lengths of DIF FFTs for future use
 cs_N = length(cs_X);
 ns_N = length(ns_X);
+nsf_N = length(nsf_X);
 
 % find values in the magnitude spectrum
 cs_mag = abs(cs_X);
 ns_mag = abs(ns_X);
+nsf_mag = abs(nsf_X);
 
 % find corresponding frequencies
 cs_f = (0:cs_N-1)*(cs_sample_rate/cs_N);
-ns_f = (0:ns_N-1)*(cs_sample_rate/ns_N);
+ns_f = (0:ns_N-1)*(ns_sample_rate/ns_N);
+nsf_f = (0:nsf_N-1)*(ns_sample_rate/nsf_N);
 
 % plot magnitude spectrum vs its corresponding frequencies
 figure;
@@ -189,6 +198,24 @@ ylim([-0.1, 70]);
 xlim([0, 4000]);
 grid on;
 
+figure;
+plot(nsf_f, nsf_mag, 'b', 'LineWidth', 1);
+title('Filtered Noisy Signal Magnitude Spectrum', 'FontSize', 20);
+xlabel('Frequency (Hz)', 'FontSize', 20);
+ylabel('Magnitude', 'FontSize', 20);
+ylim([-0.1, 70]);
+xlim([0, 4000]);
+grid on;
+
+figure;
+plot(nsf_f, nsf_mag, 'b', 'LineWidth', 1);
+title('Zoomed-In Filtered Noisy Signal Magnitude Spectrum', 'FontSize', 20);
+xlabel('Frequency (Hz)', 'FontSize', 20);
+ylabel('Magnitude', 'FontSize', 20);
+ylim([-0.1, 500]);
+xlim([0, 650]);
+grid on;
+
 % 4.3: Identify Dominant Frequencies
 
 % the "dominant frequency" is taken as the frequency in the signal with
@@ -201,5 +228,7 @@ grid on;
 % use max index to find the dominant frequency 
 cs_max_freq = cs_f(cs_max_index); % 439.9414 Hz
 ns_max_freq = ns_f(ns_max_index); % 439.9414 Hz
+
+
 
 
