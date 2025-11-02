@@ -93,6 +93,7 @@ N2_values = 2 .^ n2_values;
 % vars to hold ex_time values
 exec_t_dif = zeros(length(N2_values), 1);
 exec_t_dit = zeros(length(N2_values), 1);
+exec_t_mfft = zeros(length(N2_values), 1);
 
 for idx = 1:length(N2_values)
     N2 = N2_values(idx);
@@ -105,6 +106,7 @@ for idx = 1:length(N2_values)
     end
 
      % Measure DIF FFT and DIT FFT execution time
+    exec_t_mfft(idx) = timeit(@() fft(x));
     exec_t_dif(idx) = timeit(@() dif_fft(x));
     exec_t_dit(idx) = timeit(@() dit_fft(x));
 end
@@ -113,9 +115,10 @@ figure;
 loglog(N2_values, exec_t_dif, '-s', 'LineWidth', 1.5, 'DisplayName', 'DIF FFT');
 hold on;
 loglog(N2_values, exec_t_dit, '-s', 'LineWidth', 1.5, 'DisplayName', 'DIT FFT');
+loglog(N2_values, exec_t_mfft, '-s', 'LineWidth', 1.5, 'DisplayName', 'MATLAB FFT');
 xlabel('Number of Samples (N)', 'FontSize', 20);
 ylabel('Execution Time (seconds)', 'FontSize', 20);
-title('Execution Time of DIF FFT vs DIT FFT', 'FontSize', 20);
+title('Execution Time of DIF FFT vs DIT FFT vs MATLAB FFT', 'FontSize', 20);
 legend('Location','northwest');
 grid on;
 hold off;
