@@ -34,6 +34,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%
 % Running Naive DFT for different values of N
 
+% Limiting the samples to run to a maximum of 10 to reduce MATLAB runtime
 N_low = 1;
 N_high = 100;
 N_samples = 10;
@@ -54,8 +55,6 @@ for idx = 1:length(N_values)
     exec_t_ndft(idx) = timeit(@() naive_dft(x, N)); % Measure execution time
 end
 
-
-
 figure;
 hold on
 plot(N_values, exec_t_ndft, 'LineWidth', 1.5);
@@ -64,8 +63,6 @@ ylabel('Execution Time (s)', 'FontSize', 20);
 title('Execution Time of Naive DFT vs Sample Size', 'FontSize', 20);
 grid on
 hold off
-
-clc;
 
 %%%%%%%%%%%%%%%%%%%%%
 % Part 3.2 - Compare DIT FFT and DIF FFT
@@ -139,6 +136,7 @@ noisy_signal_filename = "noisy_signal.wav";
 
 % extra feature: apply bandpass, Butterworth filter to noisy audio file
 % used filterDesigner tool from L15 to create filter with:
+Hd2 = filter_design_feature;
 ns_filtered_data = filter(Hd2, ns_data);
 audiowrite('noisy_signal_filtered.wav', ns_filtered_data, ns_sample_rate);
 % sound(ns_filtered_data, ns_sample_rate); % to test sound in MATLAB
